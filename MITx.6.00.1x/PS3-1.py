@@ -29,12 +29,20 @@ def radiationExposure(start, stop, step):
         i += step
     return total
     '''
+    '''
     total = 0
     for x in frange(start, stop, step):
         #print str(x) + " - " + str(f(x))
         total = total + f(x) * step
     return total
-
+    '''
+    if start == stop:
+        #print str(start) + " - Return: " + str(f(start))
+        return 0
+    else:
+        #print str(start) + " - " + str(f(start))
+        return f(start) * step + radiationExposure(start + step, stop, step)
+        
 
 
 def frange(start, stop, step):
