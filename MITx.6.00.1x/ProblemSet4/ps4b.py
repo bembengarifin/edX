@@ -23,24 +23,48 @@ def compChooseWord(hand, wordList, n):
 
     returns: string or None
     """
+    def isValidWordLocal(word, hand):
+        """
+        Returns True if word is entirely
+        composed of letters in the hand. Otherwise, returns False.
+    
+        Does not mutate hand or wordList.
+    
+        word: string
+        hand: dictionary (string -> int)
+        """
+        # TO DO ... <-- Remove this comment when you code this function
+        if len(word) == 0:
+            return False
+            
+        dt = getFrequencyDict(word)
+        for d in dt.keys():
+            found = hand.get(d, 0)  
+            if found == 0 or found < dt[d]:
+                return False
+    
+        return True;
+    
     # BEGIN PSEUDOCODE <-- Remove this comment when you code this function; do your coding within the pseudocode (leaving those comments in-place!)
     # Create a new variable to store the maximum score seen so far (initially 0)
-
+    maxScore = 0
     # Create a new variable to store the best word seen so far (initially None)  
-
+    bestWord = None
     # For each word in the wordList
-
+    for word in wordList:
         # If you can construct the word from your hand
         # (hint: you can use isValidWord, or - since you don't really need to test if the word is in the wordList - you can make a similar function that omits that test)
-
+        if isValidWordLocal(word, hand):
             # Find out how much making that word is worth
-
+            score = getWordScore(word, n)
             # If the score for that word is higher than your best score
-
+            if score > maxScore:
                 # Update your best score, and best word accordingly
-
+                maxScore = score
+                bestWord = word
 
     # return the best word you found.
+    return bestWord
 
 
 #
@@ -66,6 +90,27 @@ def compPlayHand(hand, wordList, n):
     n: integer (HAND_SIZE; i.e., hand size required for additional points)
     """
     # TO DO ... <-- Remove this comment when you code this function
+    score = 0
+
+    while calculateHandlen(hand) > 0:
+        
+        print "Current Hand: ", 
+        displayHand(hand)
+
+        word = compChooseWord(hand, wordList, n)
+        if word != None:
+            wordScore = getWordScore(word, n)
+            score += wordScore
+            print '"' + word + '" earned ' + str(wordScore) + " points. Total: " + str(score) + " points"
+            print ""
+                        
+            # Update the hand 
+            hand = updateHand(hand, word)
+
+        else:
+            break;    
+
+    print "Total score: " + str(score) + " points."
     
 #
 # Problem #8: Playing a game
@@ -96,8 +141,42 @@ def playGame(wordList):
     wordList: list (string)
     """
     # TO DO... <-- Remove this comment when you code this function
-    print "playGame not yet implemented." # <-- Remove this when you code this function
+    #print "playGame not yet implemented." # <-- Remove this when you code this function
+    def choosePlayer(hand, wordList, n):
+        while True:
+            inp = raw_input('Enter u to have yourself play, c to have the computer play: ')
+    
+            if inp == "u":
+                playHand(hand, wordList, n)
+                break
+            elif inp == "c":
+                compPlayHand(hand, wordList, n)
+                break
+            else:
+                print "Invalid command." 
+            
+    inp = ""
+    hand = {}
+    while True:
 
+        inp = raw_input('Enter n to deal a new hand, r to replay the last hand, or e to end game: ')
+
+        if inp == "n":
+            hand = dealHand(HAND_SIZE)  
+                            
+            choosePlayer(hand, wordList, HAND_SIZE)
+                
+        elif inp == "r":
+            if hand == {}:
+                print "You have not played a hand yet. Please play a new hand first!"
+            else:
+                choosePlayer(hand, wordList, HAND_SIZE)
+
+        elif inp == "e":
+            break
+                        
+        else:
+            print "Invalid command."
         
 #
 # Build data structures used for entire session and play game
@@ -106,4 +185,12 @@ if __name__ == '__main__':
     wordList = loadWords()
     playGame(wordList)
 
+    #print compChooseWord({'a': 1, 'p': 2, 's': 1, 'e': 1, 'l': 1}, wordList, 6)
+    #print compChooseWord({'a': 2, 'c': 1, 'b': 1, 't': 1}, wordList, 5)
+    #print compChooseWord({'a': 2, 'e': 2, 'i': 2, 'm': 2, 'n': 2, 't': 2}, wordList, 12)
+    #print compChooseWord({'x': 2, 'z': 2, 'q': 2, 'n': 2, 't': 2}, wordList, 12)
+
+    #compPlayHand({'a': 1, 'p': 2, 's': 1, 'e': 1, 'l': 1}, wordList, 6)
+    #compPlayHand({'a': 2, 'c': 1, 'b': 1, 't': 1}, wordList, 5)
+    #compPlayHand({'a': 2, 'e': 2, 'i': 2, 'm': 2, 'n': 2, 't': 2}, wordList, 12)
 
